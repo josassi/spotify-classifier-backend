@@ -3,7 +3,7 @@ from pandas import json_normalize
 from config import oauth_manager
 import pandas as pd
 from get_functions.get_playlist_tracks import get_tracks_from_playlist
-from sklearn.ensemble import GradientBoostingClassifier
+from model.classifier import fit, predict
 
 '''
 The application is able to classify your saved tracks and create Playlists by genre from them.
@@ -81,44 +81,14 @@ class TrackClassify(spotipy.Spotify):
         self.df_training = df_final
 
     def fit(self, x_columns=None):
-        if x_columns is None:
-            x_columns = ["danceability",
-                         "energy",
-                         "speechiness",
-                         "acousticness",
-                         "instrumentalness",
-                         "liveness",
-                         "valence",
-                         "tempo",
-                         "loudness",
-                         "duration_ms"]
         if self.df_training is None:
             self.get_training_set()
-        clf = GradientBoostingClassifier()
-        x = self.df_training[x_columns]
-        y = self.df_training["category"]
-        clf.fit(X=x, y=y)
-        self.clf = clf
+        self.clf = fit(df_training=self.df_training, x_columns=x_columns)
 
     def predict(self, x_columns=None):
-        if x_columns is None:
-            x_columns = ["danceability",
-                         "energy",
-                         "speechiness",
-                         "acousticness",
-                         "instrumentalness",
-                         "liveness",
-                         "valence",
-                         "tempo",
-                         "loudness",
-                         "duration_ms"]
-        if self.df_saved_tracks is None:
-            print("Import user tracks first")
-            return
         if self.clf is None:
-            self.fit(x_columns=x_columns)
-        x = self.df_saved_tracks[x_columns]
-        self.df_saved_tracks.loc[:, "predicted category"] = self.clf.predict(x)
+            fit(x_columns=x_columns)
+        self.df_saved_tracks.loc[:, "predicted category"] = predict(clf=self.clf, df_saved_tracks=self.df_saved_tracks)
 
     def create_playlist(self, playlist_name: str):
         self.user_playlist_create(user=self.user_id, name=playlist_name, public=False)
@@ -133,13 +103,13 @@ class TrackClassify(spotipy.Spotify):
             bulked_items = items[i * bulk:(i + 1) * bulk]
             self.playlist_add_items(playlist_id=playlist_id, items=bulked_items)
 
-    def create_categorized_playlists(self):
+    def create_categorized_playlists(self, prefix="test_"):
         if "predicted category" not in self.df_saved_tracks:
             self.predict()
             print("classified saved tracks")
         for category in self.categories_dict.keys():
             tracks_to_add = list(self.df_saved_tracks[self.df_saved_tracks["predicted category"] == category]["id"])
-            playlist_id = self.create_playlist(playlist_name=category)
+            playlist_id = self.create_playlist(playlist_name=prefix+category)
             self.add_tracks_to_playlist(playlist_id=playlist_id, items=tracks_to_add)
 
     def saved_to_playlists(self, genres_dict=None):
