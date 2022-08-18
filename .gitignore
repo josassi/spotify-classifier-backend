@@ -1,3 +1,4 @@
 # Project exclude paths
 /venv/
 /config.py
+/test_data/
