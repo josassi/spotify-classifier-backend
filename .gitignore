@@ -1,4 +1,85 @@
-# Project exclude paths
+# Virtual Environments
 /venv/
+/.venv/
+env/
+venv/
+ENV/
+
+# Configuration and Secrets
 /config.py
+.env
+*.env
+.env.*
+.flaskenv*
+!.env.project
+!.env.vault
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing
 /test/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Data files
+*.csv
+*.sqlite
+*.db
+*.pickle
+*.pkl
+
+# Log files
+*.log
+logs/
+log/
+
+# Mac OS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# Spotify API specific
+.cache*
+tokens/
+
+# Custom Project files
+temp/
